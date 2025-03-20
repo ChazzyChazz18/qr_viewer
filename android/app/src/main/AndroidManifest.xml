@@ -1,8 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
+
+
     <application
         android:label="qr_viewer"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <activity
+        android:name=".CameraActivity"
+        android:exported="false"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
