@@ -5,6 +5,6 @@ class QRViewerBloc {
   Future<String?> scanQRCode() async {
     final qrCodeApi = QRCodeApi();
     final result = await qrCodeApi.scanQRCode();
-    return result.data;
+    return result;
   }
 }

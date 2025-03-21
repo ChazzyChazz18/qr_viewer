@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:qr_viewer/features/qr_viewer/camera_service.dart';
 import 'package:qr_viewer/features/qr_viewer/presentation/bloc/qr_viewer_bloc.dart';
-import 'package:qr_viewer/features/qr_viewer/presentation/widgets/scan_button.dart';
+import 'package:qr_viewer/features/qr_viewer/presentation/pages/qr_data_list_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -19,16 +18,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
-    getQRCodeData();
   }
 
-  void getQRCodeData() async {
-    final result = await _qrViewerBloc.scanQRCode();
-    setState(() {
-      qrCodeData = result ?? "No data found";
-    });
-  }
+  void getQRCodeData() async => await _qrViewerBloc.scanQRCode();
 
   @override
   Widget build(BuildContext context) {
@@ -37,22 +29,29 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Column(
-        children: [
-          Center(
-            child: Text(qrCodeData),
-          ),
-          Expanded(
-            child: Center(
-              child: ScanButton(
-                onPressed: () {
-                  //Pressed logic here
-                  CameraService.startCamera();
-                },
-              ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 32,
+          children: [
+            ElevatedButton(
+              onPressed: () => getQRCodeData(),
+              child: Text('Scan QR Code'),
             ),
-          ),
-        ],
+            ElevatedButton(
+              onPressed: () {
+                // go to home page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const QRDataListPage(),
+                  ),
+                );
+              },
+              child: Text('QR Code List'),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -2,14 +2,19 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="true" />
-
+    
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+<!--    <uses-permission android:name="android.permission.USE_FINGERPRINT" />-->
 
     <application
         android:label="qr_viewer"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
-        android:name=".CameraActivity"
+        android:name=".BiometricCompatActivity"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+        android:name=".ui.scanner.CameraActivity"
         android:exported="false"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity

@@ -1,24 +1,3 @@
-// class CameraViewModel(
-//     private val repository: CameraRepository
-// ) : ViewModel() {
-//     private val _detectedQRCode = MutableLiveData<String?>()
-//     val detectedQRCode: LiveData<String?> get() = _detectedQRCode
-
-//     fun processImage(inputImage: InputImage) {
-//         viewModelScope.launch {
-//             try {
-//                 val qrCode = repository.scanQRCode(inputImage)
-//                 _detectedQRCode.postValue(qrCode)
-//             } catch (e: Exception) {
-//                 Log.e("CameraViewModel", "Error processing image: ${e.message}")
-//             }
-//         }
-//     }
-
-//     fun onUrlHandled() {
-//         _detectedQRCode.postValue(null) // Reset the detected QR code state
-//     }
-// }
 package com.example.qr_viewer.ui.scanner
 
 import androidx.lifecycle.ViewModel

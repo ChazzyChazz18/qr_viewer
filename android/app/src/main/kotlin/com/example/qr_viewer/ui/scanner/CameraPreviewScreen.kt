@@ -9,27 +9,31 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.LifecycleOwner
-import com.google.mlkit.vision.common.InputImage
+import androidx.compose.ui.platform.LocalContext
+import android.content.Intent
+import android.net.Uri
 
 @Composable
-fun CameraPreviewScreen(
-    lifecycleOwner: LifecycleOwner,
-    onClose: () -> Unit,
-    onImageCaptured: (InputImage) -> Unit
-) {
+fun CameraPreviewScreen(lifecycleOwner: LifecycleOwner, onClose: () -> Unit) {
+    val context = LocalContext.current
+
     var detectedUrl by remember { mutableStateOf<String?>(null) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         CameraPreview(
             lifecycleOwner = lifecycleOwner,
-            onImageCaptured = onImageCaptured // Captures image and sends it to the parent
+            onDetectedUrl = { detectedUrl = it }
         )
         CloseButton(onClose = onClose)
 
         if (detectedUrl != null) {
             UrlDialog(
                 url = detectedUrl,
-                onOpen = { /* Handle URL opening */ },
+                onOpen = {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(detectedUrl))
+                    context.startActivity(intent) // Open URL in browser
+                    detectedUrl = null
+                },
                 onCancel = { detectedUrl = null }
             )
         }

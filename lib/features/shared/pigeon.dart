@@ -15,23 +15,28 @@ PlatformException _createConnectionError(String channelName) {
   );
 }
 
-class QRCodeData {
-  QRCodeData({
-    this.data,
+class QRCode {
+  QRCode({
+    this.rawValue,
+    this.timestamp,
   });
 
-  String? data;
+  String? rawValue;
+
+  int? timestamp;
 
   Object encode() {
     return <Object?>[
-      data,
+      rawValue,
+      timestamp,
     ];
   }
 
-  static QRCodeData decode(Object result) {
+  static QRCode decode(Object result) {
     result as List<Object?>;
-    return QRCodeData(
-      data: result[0] as String?,
+    return QRCode(
+      rawValue: result[0] as String?,
+      timestamp: result[1] as int?,
     );
   }
 }
@@ -44,7 +49,7 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    }    else if (value is QRCodeData) {
+    }    else if (value is QRCode) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
     } else {
@@ -56,7 +61,7 @@ class _PigeonCodec extends StandardMessageCodec {
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
       case 129: 
-        return QRCodeData.decode(readValue(buffer)!);
+        return QRCode.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -76,8 +81,31 @@ class QRCodeApi {
 
   final String pigeonVar_messageChannelSuffix;
 
-  Future<QRCodeData> scanQRCode() async {
+  Future<String?> scanQRCode() async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.qr_viewer.QRCodeApi.scanQRCode$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return (pigeonVar_replyList[0] as String?);
+    }
+  }
+
+  Future<List<QRCode?>> getAllSavedQRCodes() async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.qr_viewer.QRCodeApi.getAllSavedQRCodes$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -100,16 +128,16 @@ class QRCodeApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as QRCodeData?)!;
+      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<QRCode?>();
     }
   }
 }
 
-class BiometricsApi {
-  /// Constructor for [BiometricsApi].  The [binaryMessenger] named argument is
+class BiometricAuthApi {
+  /// Constructor for [BiometricAuthApi].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  BiometricsApi({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
+  BiometricAuthApi({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
       : pigeonVar_binaryMessenger = binaryMessenger,
         pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
   final BinaryMessenger? pigeonVar_binaryMessenger;
@@ -118,14 +146,42 @@ class BiometricsApi {
 
   final String pigeonVar_messageChannelSuffix;
 
-  Future<bool> authenticate() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.qr_viewer.BiometricsApi.authenticate$pigeonVar_messageChannelSuffix';
+  Future<bool> isBiometricAvailable() async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.qr_viewer.BiometricAuthApi.isBiometricAvailable$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (pigeonVar_replyList[0] as bool?)!;
+    }
+  }
+
+  Future<bool> authenticate(String promptMessage) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.qr_viewer.BiometricAuthApi.authenticate$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[promptMessage]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {

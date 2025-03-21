@@ -47,19 +47,22 @@ class FlutterError (
 ) : Throwable()
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class QRCodeData (
-  val data: String? = null
+data class QRCode (
+  val rawValue: String? = null,
+  val timestamp: Long? = null
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): QRCodeData {
-      val data = pigeonVar_list[0] as String?
-      return QRCodeData(data)
+    fun fromList(pigeonVar_list: List<Any?>): QRCode {
+      val rawValue = pigeonVar_list[0] as String?
+      val timestamp = pigeonVar_list[1] as Long?
+      return QRCode(rawValue, timestamp)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      data,
+      rawValue,
+      timestamp,
     )
   }
 }
@@ -68,7 +71,7 @@ private open class PigeonPigeonCodec : StandardMessageCodec() {
     return when (type) {
       129.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          QRCodeData.fromList(it)
+          QRCode.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -76,7 +79,7 @@ private open class PigeonPigeonCodec : StandardMessageCodec() {
   }
   override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
     when (value) {
-      is QRCodeData -> {
+      is QRCode -> {
         stream.write(129)
         writeValue(stream, value.toList())
       }
@@ -85,9 +88,11 @@ private open class PigeonPigeonCodec : StandardMessageCodec() {
   }
 }
 
+
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface QRCodeApi {
-  fun scanQRCode(): QRCodeData
+  fun scanQRCode(): String?
+  fun getAllSavedQRCodes(callback: (Result<List<QRCode?>>) -> Unit)
 
   companion object {
     /** The codec used by QRCodeApi. */
@@ -113,28 +118,64 @@ interface QRCodeApi {
           channel.setMessageHandler(null)
         }
       }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.qr_viewer.QRCodeApi.getAllSavedQRCodes$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.getAllSavedQRCodes{ result: Result<List<QRCode?>> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
     }
   }
 }
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
-interface BiometricsApi {
-  fun authenticate(): Boolean
+interface BiometricAuthApi {
+  fun isBiometricAvailable(): Boolean
+  fun authenticate(promptMessage: String): Boolean
 
   companion object {
-    /** The codec used by BiometricsApi. */
+    /** The codec used by BiometricAuthApi. */
     val codec: MessageCodec<Any?> by lazy {
       PigeonPigeonCodec()
     }
-    /** Sets up an instance of `BiometricsApi` to handle messages through the `binaryMessenger`. */
+    /** Sets up an instance of `BiometricAuthApi` to handle messages through the `binaryMessenger`. */
     @JvmOverloads
-    fun setUp(binaryMessenger: BinaryMessenger, api: BiometricsApi?, messageChannelSuffix: String = "") {
+    fun setUp(binaryMessenger: BinaryMessenger, api: BiometricAuthApi?, messageChannelSuffix: String = "") {
       val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.qr_viewer.BiometricsApi.authenticate$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.qr_viewer.BiometricAuthApi.isBiometricAvailable$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             val wrapped: List<Any?> = try {
-              listOf(api.authenticate())
+              listOf(api.isBiometricAvailable())
+            } catch (exception: Throwable) {
+              wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.qr_viewer.BiometricAuthApi.authenticate$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val promptMessageArg = args[0] as String
+            val wrapped: List<Any?> = try {
+              listOf(api.authenticate(promptMessageArg))
             } catch (exception: Throwable) {
               wrapError(exception)
             }

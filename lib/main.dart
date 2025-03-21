@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'features/qr_viewer/presentation/pages/home_page.dart';
+import 'package:qr_viewer/features/biometric_login/presentation/pages/login.dart';
 
 void main() {
   runApp(const QRViewer());
@@ -17,7 +16,7 @@ class QRViewer extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const HomePage(title: 'QR Viewer Home Page'),
+      home: const LoginPage(),
     );
   }
 }

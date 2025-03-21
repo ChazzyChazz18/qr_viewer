@@ -13,9 +13,6 @@ interface QRCodeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertQRCode(qrCode: QRCode)
 
-    // @Query("SELECT * FROM qr_codes WHERE id = :id")
-    // suspend fun getQRCodeById(id: Int): QRCode?
-
     @Query("SELECT * FROM qr_codes")
     fun getAllQRCodes(): LiveData<List<QRCode>>
 }
