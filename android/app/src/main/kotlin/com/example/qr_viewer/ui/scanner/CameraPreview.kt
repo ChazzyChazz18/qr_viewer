@@ -15,6 +15,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
+import androidx.lifecycle.lifecycleScope
+import com.example.qr_viewer.QRCodeApiImplementation
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalGetImage::class)
 @Composable
@@ -50,6 +53,10 @@ fun CameraPreview(
                                         } else {
                                             Toast.makeText(ctx, "Code detected: $rawValue", Toast.LENGTH_SHORT).show()
                                         }
+
+                                        if (rawValue != null) {
+                                            onQRCodeScanned(rawValue, ctx as CameraActivity)
+                                        }
                                     }
                                 }
                                 .addOnFailureListener { e ->
@@ -79,4 +86,12 @@ fun CameraPreview(
             previewView
         }
     )
+}
+
+fun onQRCodeScanned(content: String, activity: CameraActivity) {
+    val qrCodeApi = QRCodeApiImplementation(null)
+    activity.lifecycleScope.launch {
+        qrCodeApi.saveQRCode(com.example.qr_viewer.data.model.QRCode(rawValue = content), activity) // Save scanned QR code to Room DB
+        println("QR code saved: $content")
+    }
 }

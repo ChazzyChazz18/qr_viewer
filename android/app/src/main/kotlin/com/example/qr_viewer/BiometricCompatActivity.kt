@@ -3,6 +3,7 @@ package com.example.qr_viewer
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 
@@ -11,7 +12,7 @@ class BiometricCompatActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val promptMessage = intent.getStringExtra("PROMPT_MESSAGE") ?: "Autenticación requerida"
+        val promptMessage = intent.getStringExtra("PROMPT_MESSAGE") ?: "Authentication required"
 
         val executor = ContextCompat.getMainExecutor(this)
         val biometricPrompt = BiometricPrompt(
@@ -19,37 +20,40 @@ class BiometricCompatActivity : AppCompatActivity() {
             executor,
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                    super.onAuthenticationSucceeded(result)
-                    val intent = Intent()
-                    intent.putExtra("auth_result", true)
-                    setResult(RESULT_OK, intent)
+                    sendResult(true)
                     finish()
                 }
 
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                    super.onAuthenticationError(errorCode, errString)
-                    val intent = Intent()
-                    intent.putExtra("auth_result", false)
-                    setResult(RESULT_CANCELED, intent)
-                    finish()
+                    sendResult(false)
+
+                    if (errorCode == BiometricPrompt.ERROR_USER_CANCELED ||
+                        errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON ||
+                        errorCode == BiometricPrompt.ERROR_CANCELED) {
+                        finish()
+                    }
                 }
 
                 override fun onAuthenticationFailed() {
-                    super.onAuthenticationFailed()
-                    val intent = Intent()
-                    intent.putExtra("auth_result", false)
-                    setResult(RESULT_CANCELED, intent)
-                    finish()
+                    sendResult(false)
                 }
             }
         )
 
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(promptMessage)
-            .setSubtitle("Usa tu biometría para continuar")
-            .setNegativeButtonText("Cancelar")
+            .setSubtitle("Use your biometric credentials to authenticate")
+            .setAllowedAuthenticators(
+                BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
+            )
             .build()
 
         biometricPrompt.authenticate(promptInfo)
+    }
+
+    private fun sendResult(success: Boolean) {
+        val intent = Intent().apply { putExtra("auth_result", success) }
+        setResult(RESULT_OK, intent)
     }
 }

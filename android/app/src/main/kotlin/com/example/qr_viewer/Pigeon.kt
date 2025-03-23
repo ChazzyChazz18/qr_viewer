@@ -142,7 +142,7 @@ interface QRCodeApi {
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface BiometricAuthApi {
   fun isBiometricAvailable(): Boolean
-  fun authenticate(promptMessage: String): Boolean
+  fun authenticate(promptMessage: String, callback: (Result<Boolean>) -> Unit)
 
   companion object {
     /** The codec used by BiometricAuthApi. */
@@ -174,12 +174,15 @@ interface BiometricAuthApi {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val promptMessageArg = args[0] as String
-            val wrapped: List<Any?> = try {
-              listOf(api.authenticate(promptMessageArg))
-            } catch (exception: Throwable) {
-              wrapError(exception)
+            api.authenticate(promptMessageArg) { result: Result<Boolean> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
             }
-            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)

@@ -21,5 +21,7 @@ abstract class QRCodeApi {
 @HostApi()
 abstract class BiometricAuthApi {
   bool isBiometricAvailable();
+
+  @async
   bool authenticate(String promptMessage);
 }

@@ -22,11 +22,11 @@ class _LoginPageState extends State<LoginPage> {
       body: Center(
         child: ElevatedButton(
           onPressed: () async {
-            var result = await _biometricBloc.authenticate(
-              'Authenticate with biometric',
+            var isAuthenticated = await _biometricBloc.authenticate(
+              'Authenticate',
             );
-
-            if (result) {
+            debugPrint("isAuthenticated: $isAuthenticated");
+            if (isAuthenticated) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
