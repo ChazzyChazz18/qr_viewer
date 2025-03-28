@@ -15,6 +15,11 @@ buildscript {
         // Kotlin Gradle Plugin
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
+        // Dagger Hilt Usage
+//        classpath "com.google.dagger:hilt-android-gradle-plugin:2.52"
+
+        classpath "com.android.tools.build:gradle:8.0.2"
+
         // Other classpath dependencies for Flutter
         // classpath "com.google.gms:google-services:4.3.15" // Optional: for Firebase
     }

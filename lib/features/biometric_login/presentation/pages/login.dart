@@ -12,6 +12,22 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final BiometricBloc _biometricBloc = BiometricBloc();
 
+  void _navigateToHomePage() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => const HomePage(title: 'Home'),
+      ),
+    );
+  }
+
+  void _handleAuthentication() async {
+    var isAuthenticated = await _biometricBloc.authenticate(
+      'Authenticate',
+    );
+
+    if (isAuthenticated) _navigateToHomePage();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,20 +37,7 @@ class _LoginPageState extends State<LoginPage> {
       ),
       body: Center(
         child: ElevatedButton(
-          onPressed: () async {
-            var isAuthenticated = await _biometricBloc.authenticate(
-              'Authenticate',
-            );
-            debugPrint("isAuthenticated: $isAuthenticated");
-            if (isAuthenticated) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const HomePage(title: 'Home Page'),
-                ),
-              );
-            }
-          },
+          onPressed: _handleAuthentication,
           child: Text('Login'),
         ),
       ),

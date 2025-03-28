@@ -13,14 +13,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final QRViewerBloc _qrViewerBloc = QRViewerBloc();
-  String qrCodeData = '';
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   void getQRCodeData() async => await _qrViewerBloc.scanQRCode();
+
+  void navigateToQRDataListPage() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const QRDataListPage(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,19 +37,11 @@ class _HomePageState extends State<HomePage> {
           spacing: 32,
           children: [
             ElevatedButton(
-              onPressed: () => getQRCodeData(),
+              onPressed: getQRCodeData,
               child: Text('Scan QR Code'),
             ),
             ElevatedButton(
-              onPressed: () {
-                // go to home page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const QRDataListPage(),
-                  ),
-                );
-              },
+              onPressed: navigateToQRDataListPage,
               child: Text('QR Code List'),
             ),
           ],

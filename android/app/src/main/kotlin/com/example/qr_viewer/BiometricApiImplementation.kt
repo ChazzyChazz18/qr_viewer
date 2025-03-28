@@ -32,7 +32,7 @@ class BiometricApiImplementation(private val context: Context) : BiometricAuthAp
         val intent = Intent(context, BiometricCompatActivity::class.java).apply {
             putExtra("PROMPT_MESSAGE", promptMessage)
         }
-        (context as Activity).startActivityForResult(intent, REQUEST_CODE_BIOMETRIC)
+        context.startActivityForResult(intent, REQUEST_CODE_BIOMETRIC)
 
         // Launch a coroutine to wait for the result in the shared flow
         GlobalScope.launch {

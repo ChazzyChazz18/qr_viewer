@@ -12,6 +12,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.compose.ui.platform.LocalContext
 import android.content.Intent
 import android.net.Uri
+import com.example.qr_viewer.DependencyProvider
 
 @Composable
 fun CameraPreviewScreen(lifecycleOwner: LifecycleOwner, onClose: () -> Unit) {
@@ -22,6 +23,7 @@ fun CameraPreviewScreen(lifecycleOwner: LifecycleOwner, onClose: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize()) {
         CameraPreview(
             lifecycleOwner = lifecycleOwner,
+            qrCodeViewModel = DependencyProvider.provideQRCodeViewModel(),
             onDetectedUrl = { detectedUrl = it }
         )
         CloseButton(onClose = onClose)

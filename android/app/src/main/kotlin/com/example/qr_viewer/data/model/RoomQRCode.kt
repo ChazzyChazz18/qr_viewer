@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "qr_codes")
-data class QRCode(
+data class RoomQRCode(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val rawValue: String,
     val timestamp: Long = System.currentTimeMillis()

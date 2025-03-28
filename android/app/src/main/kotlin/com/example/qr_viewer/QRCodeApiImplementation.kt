@@ -1,52 +1,32 @@
 package com.example.qr_viewer
 
-import android.content.Intent
-import androidx.lifecycle.lifecycleScope
-import com.example.qr_viewer.data.database.QRCodeDatabase
+import androidx.lifecycle.viewModelScope
+import com.example.qr_viewer.ui.ActivityLauncher
 import com.example.qr_viewer.ui.scanner.CameraActivity
-import io.flutter.embedding.android.FlutterActivity
-import kotlinx.coroutines.launch
-import com.example.qr_viewer.data.model.toPigeonQRCode
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import com.example.qr_viewer.data.model.QRCode
+import com.example.qr_viewer.ui.scanner.QRCodeViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
-class QRCodeApiImplementation(private val activity: FlutterActivity?) : QRCodeApi {
+class QRCodeApiImplementation(
+    private val viewModel: QRCodeViewModel,
+    private val activityLauncher: ActivityLauncher
+) : QRCodeApi {
 
     companion object {
-        const val SCAN_QR_REQUEST_CODE = 1002 // Define a unique integer code for QR scanning
+        const val SCAN_QR_REQUEST_CODE = 1001
     }
 
     override fun scanQRCode(): String {
-        val intent = Intent(activity, CameraActivity::class.java)
-        activity?.startActivityForResult(intent, SCAN_QR_REQUEST_CODE)
+        // Use the launcher to open CameraActivity
+        activityLauncher.launchActivity(CameraActivity::class.java)
 
         return "Sample QR Code Data"
     }
 
-    suspend fun saveQRCode(qrCode: QRCode, activity: CameraActivity) {
-        val qrCodeDao = QRCodeDatabase.getDatabase(activity).qrCodeDao()
-        withContext(Dispatchers.IO) {
-            qrCodeDao.insertQRCode(qrCode)
-        }
+    override fun getAllSavedQRCodes(callback: (Result<List<QRCode?>>) -> Unit) {
+        viewModel.qrCodes.onEach { qrCodes ->
+            callback(Result.success(qrCodes))
+        }.launchIn(viewModel.viewModelScope) // Use the ViewModel's scope
     }
 
-
-    override fun getAllSavedQRCodes(callback: (Result<List<com.example.qr_viewer.QRCode?>>) -> Unit) {
-        val qrCodeDao = QRCodeDatabase.getDatabase(activity!!).qrCodeDao()
-
-        activity.lifecycleScope.launch {
-            try {
-                val qrCodesFromRoom = qrCodeDao.getAllQRCodes()
-
-                // Handle nullability for qrCodesFromRoom.value
-                val mappedQRCodes = qrCodesFromRoom.value?.map { it.toPigeonQRCode() } ?: emptyList()
-
-                // Ensure mappedQRCodes satisfies the expected type
-                callback(Result.success(mappedQRCodes))
-            } catch (e: Exception) {
-                callback(Result.failure(e))
-            }
-        }
-    }
 }
