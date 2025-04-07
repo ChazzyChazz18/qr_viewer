@@ -1,58 +1,56 @@
 package com.example.qr_viewer.ui.scanner
 
-import android.content.Context
+import android.util.Log
+import androidx.annotation.OptIn
+import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
-import com.google.mlkit.vision.common.InputImage
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.lifecycle.lifecycleScope
+import com.example.qr_viewer.data.model.QRCodeContent
+import com.example.qr_viewer.data.model.QRCodeScannerConfig
 import com.google.mlkit.vision.barcode.BarcodeScanning
-import android.util.Log
-import androidx.annotation.OptIn
-import androidx.camera.core.ExperimentalGetImage
+import com.google.mlkit.vision.common.InputImage
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun CameraPreview(
-    lifecycleOwner: LifecycleOwner,
-    qrCodeViewModel: QRCodeViewModel, // Add the ViewModel as a parameter
-    onDetectedUrl: (String) -> Unit
+    scannerConfig: QRCodeScannerConfig
 ) {
     AndroidView(
         modifier = Modifier.fillMaxSize(),
         factory = { ctx ->
             val previewView = PreviewView(ctx)
-            setupCamera(ctx, lifecycleOwner, previewView, qrCodeViewModel, onDetectedUrl)
+            setupCamera(scannerConfig, previewView)
             previewView
         }
     )
 }
 
 private fun setupCamera(
-    ctx: Context,
-    lifecycleOwner: LifecycleOwner,
-    previewView: PreviewView,
-    qrCodeViewModel: QRCodeViewModel, // Accept the ViewModel here
-    onDetectedUrl: (String) -> Unit
+    scannerConfig: QRCodeScannerConfig,
+    previewView: PreviewView
 ) {
-    val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
+    val cameraProviderFuture = ProcessCameraProvider.getInstance(scannerConfig.context)
     cameraProviderFuture.addListener({
         val cameraProvider = cameraProviderFuture.get()
         val preview = androidx.camera.core.Preview.Builder().build().apply {
             surfaceProvider = previewView.surfaceProvider
         }
 
-        val imageAnalyzer = setupImageAnalyzer(ctx, qrCodeViewModel, onDetectedUrl)
+        val imageAnalyzer = setupImageAnalyzer(scannerConfig)
 
         val cameraSelector = androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
         try {
             cameraProvider.unbindAll() // Unbind previous use cases
             cameraProvider.bindToLifecycle(
-                lifecycleOwner,
+                scannerConfig.lifecycleOwner,
                 cameraSelector,
                 preview,
                 imageAnalyzer // Ensure analyzer is bound
@@ -60,75 +58,81 @@ private fun setupCamera(
         } catch (e: Exception) {
             Log.e("CameraSetup", "Error setting up camera: ${e.message}", e)
         }
-    }, ContextCompat.getMainExecutor(ctx))
+    }, ContextCompat.getMainExecutor(scannerConfig.context))
 }
 
 @OptIn(ExperimentalGetImage::class)
 private fun setupImageAnalyzer(
-    ctx: Context,
-    qrCodeViewModel: QRCodeViewModel, // Accept the ViewModel here
-    onDetectedUrl: (String) -> Unit
+    scannerConfig: QRCodeScannerConfig
 ): ImageAnalysis {
-    var isScanning = false
     var lastScannedCode: String? = null
+    val timeMilliseconds: Long = 2_000
 
     return ImageAnalysis.Builder().build().apply {
-        setAnalyzer(ContextCompat.getMainExecutor(ctx)) { imageProxy ->
+        setAnalyzer(ContextCompat.getMainExecutor(scannerConfig.context)) { imageProxy ->
             val mediaImage = imageProxy.image
             val rotationDegrees = imageProxy.imageInfo.rotationDegrees
 
-            // Ensure scanning only proceeds if not already in progress or if no image
-            if (isScanning || mediaImage == null) {
+            // Ensure scanning only proceeds if there is an image
+            if (mediaImage == null) {
                 imageProxy.close()
                 return@setAnalyzer
             }
 
-            isScanning = true
             val inputImage = InputImage.fromMediaImage(mediaImage, rotationDegrees)
             val scanner = BarcodeScanning.getClient()
 
             scanner.process(inputImage)
                 .addOnSuccessListener { barcodes ->
-                    barcodes.firstOrNull { it.rawValue != null && it.rawValue != lastScannedCode }?.let { barcode ->
+                    barcodes.firstOrNull {
+                        it.rawValue != null && it.rawValue != lastScannedCode
+                    }?.let { barcode ->
+                        if(lastScannedCode == barcode.rawValue){
+                            return@let
+                        }
+
                         lastScannedCode = barcode.rawValue
 
                         // Trigger handling logic for the scanned QR code
                         handleQRCodeScanned(
-                            qrCodeViewModel,
-                            barcode.rawValue!!,
-                            onDetectedUrl
-                        ) {
-                            isScanning = false // Reset scanning state when handling completes
-                            lastScannedCode = null // Clear the scanned code
+                            scannerConfig,
+                            barcode.rawValue!!
+                        ){
+                            // Reset the last scanned code after the snack bar is dismissed
+                            scannerConfig.lifecycleOwner.lifecycleScope.launch {
+                                delay(timeMillis = timeMilliseconds)
+                                lastScannedCode = null
+                            }
                         }
-                    } ?: run { isScanning = false } // Reset if no valid QR code is found
+                    }
                 }
                 .addOnFailureListener { e ->
                     Log.e("QRCode", "Error scanning code: ${e.message}", e)
-                    isScanning = false // Reset scanning state on error
                 }
                 .addOnCompleteListener {
-                    imageProxy.close() // Always close the image proxy
+                    imageProxy.close()
                 }
         }
     }
 }
 
+// Handle the scanned QR code
 private fun handleQRCodeScanned(
-    qrCodeViewModel: QRCodeViewModel, // Use the ViewModel
+    scannerConfig: QRCodeScannerConfig,
     rawValue: String,
-    onDetectedUrl: (String) -> Unit,
     onComplete: () -> Unit
 ) {
-    if (rawValue.startsWith("http")) {
-        onDetectedUrl(rawValue)
-        Log.d("QRCode", "URL detected: $rawValue")
+    val detectedContent = if (rawValue.startsWith("http")) {
+        QRCodeContent.Url(rawValue)
     } else {
-        Log.d("QRCode", "Non-URL QR code detected: $rawValue")
+        QRCodeContent.Text(rawValue)
     }
 
+    scannerConfig.onDetected(detectedContent) // Use the callback in the config
+    Log.d("QRCode", "QR Code detected: $rawValue")
+
     // Save the QR code using ViewModel
-    qrCodeViewModel.saveQRCode(
+    scannerConfig.qrCodeViewModel.saveQRCode(
         com.example.qr_viewer.data.model.RoomQRCode(
             rawValue = rawValue,
             timestamp = System.currentTimeMillis()

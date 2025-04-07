@@ -13,18 +13,17 @@ class CameraActivity : ComponentActivity() {
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
-        if (isGranted) {
-            // Permission is granted, initialize the camera preview
-            initializeCameraPreview()
-        } else {
+        if (!isGranted) {
             // Permission is denied
             Log.e("CameraActivity", "Camera permission was denied!")
+            return@registerForActivityResult
         }
+        // Permission is granted
+        initializeCameraPreview()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         // Check for camera permissions
         if (ContextCompat.checkSelfPermission(
                 this,

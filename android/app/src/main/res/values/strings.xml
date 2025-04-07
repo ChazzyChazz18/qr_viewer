@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="qr_code_database">qr_code_database</string>
+    <string name="open_url">Open url</string>
+</resources>

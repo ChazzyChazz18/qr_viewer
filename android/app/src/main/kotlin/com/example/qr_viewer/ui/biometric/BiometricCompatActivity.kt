@@ -1,4 +1,4 @@
-package com.example.qr_viewer
+package com.example.qr_viewer.ui.biometric
 
 import android.content.Intent
 import android.os.Bundle

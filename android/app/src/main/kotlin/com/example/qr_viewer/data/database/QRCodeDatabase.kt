@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.qr_viewer.R
 import com.example.qr_viewer.data.dao.QRCodeDao
 import com.example.qr_viewer.data.model.RoomQRCode
 
@@ -20,7 +21,7 @@ abstract class QRCodeDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     QRCodeDatabase::class.java,
-                    "qr_code_database"
+                    context.getString(R.string.qr_code_database)
                 ).build()
                 INSTANCE = instance
                 instance

@@ -10,7 +10,7 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
-        android:name=".BiometricCompatActivity"
+        android:name=".ui.biometric.BiometricCompatActivity"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
         android:name=".ui.scanner.CameraActivity"

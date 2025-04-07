@@ -1,4 +1,4 @@
-package com.example.qr_viewer.ui
+package com.example.qr_viewer.ui.common
 
 import android.os.Bundle
 

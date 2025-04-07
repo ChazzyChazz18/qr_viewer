@@ -2,14 +2,17 @@ package com.example.qr_viewer
 
 import android.content.Intent
 import android.os.Bundle
-import com.example.qr_viewer.ui.ActivityLauncher
-import com.example.qr_viewer.ui.scanner.QRCodeViewModel
+import com.example.qr_viewer.di.DependencyProvider
+import com.example.qr_viewer.pigeon.BiometricApiImplementation
+import com.example.qr_viewer.pigeon.BiometricAuthApi
+import com.example.qr_viewer.pigeon.QRCodeApi
+import com.example.qr_viewer.pigeon.QRCodeApiImplementation
+import com.example.qr_viewer.ui.common.ActivityLauncher
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.BinaryMessenger
 
 class MainActivity : FlutterActivity(), ActivityLauncher {
-
-    private lateinit var qrCodeViewModel: QRCodeViewModel
 
     private lateinit var biometricApi: BiometricApiImplementation
 
@@ -17,27 +20,40 @@ class MainActivity : FlutterActivity(), ActivityLauncher {
         super.configureFlutterEngine(flutterEngine)
 
         // Initialize dependencies
-        DependencyProvider.initialize(this.applicationContext)
+        DependencyProvider.QRCode.initialize(this.applicationContext)
+        DependencyProvider.Biometric.initialize()
 
-        qrCodeViewModel = DependencyProvider.provideQRCodeViewModel()
+        initializePigeonAPIs(flutterEngine.dartExecutor.binaryMessenger)
+    }
 
-        val binaryMessenger = flutterEngine.dartExecutor.binaryMessenger
+    private fun initializePigeonAPIs(binaryMessenger: BinaryMessenger) {
+        setUpQRCodeApi(binaryMessenger)
+        setUpBiometricApi(binaryMessenger)
+    }
 
+    private fun setUpQRCodeApi(binaryMessenger: BinaryMessenger) {
         QRCodeApi.setUp(
             binaryMessenger,
             QRCodeApiImplementation(
-                viewModel =  qrCodeViewModel,
+                viewModel =  DependencyProvider.QRCode.provideQRCodeViewModel(),
                 activityLauncher = this
             )
         )
+    }
 
-        biometricApi = BiometricApiImplementation(this)
+    private fun setUpBiometricApi(binaryMessenger: BinaryMessenger) {
+        biometricApi = BiometricApiImplementation(
+            this,
+            DependencyProvider.Biometric.provideBiometricViewModel()
+        )
+
         BiometricAuthApi.setUp(
             binaryMessenger = binaryMessenger,
             api = biometricApi
         )
     }
 
+    // Handle activity result for biometric authentication
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == BiometricApiImplementation.REQUEST_CODE_BIOMETRIC) {
@@ -53,6 +69,5 @@ class MainActivity : FlutterActivity(), ActivityLauncher {
 
         startActivity(intent)
     }
-
 
 }
