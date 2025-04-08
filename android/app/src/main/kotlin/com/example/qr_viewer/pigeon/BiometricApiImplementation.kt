@@ -4,6 +4,7 @@ import com.example.qr_viewer.ui.biometric.BiometricViewModel
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import com.example.qr_viewer.R
 import com.example.qr_viewer.ui.biometric.BiometricCompatActivity
 
 // Pigeon interfaces implementations for biometric authentication
@@ -32,7 +33,7 @@ class BiometricApiImplementation(
 
         // Launch the biometric activity
         val intent = Intent(context, BiometricCompatActivity::class.java).apply {
-            putExtra("PROMPT_MESSAGE", promptMessage)
+            putExtra(context.getString(R.string.biometric_extra_pm), promptMessage)
         }
         context.startActivityForResult(intent, REQUEST_CODE_BIOMETRIC)
 

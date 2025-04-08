@@ -132,12 +132,17 @@ private fun handleQRCodeScanned(
     Log.d("QRCode", "QR Code detected: $rawValue")
 
     // Save the QR code using ViewModel
-    scannerConfig.qrCodeViewModel.saveQRCode(
-        com.example.qr_viewer.data.model.RoomQRCode(
-            rawValue = rawValue,
-            timestamp = System.currentTimeMillis()
+    try {
+        scannerConfig.qrCodeViewModel.saveQRCode(
+            com.example.qr_viewer.data.model.RoomQRCode(
+                rawValue = rawValue,
+                timestamp = System.currentTimeMillis()
+            )
         )
-    )
+    }catch (e: Exception){
+        Log.d("QRCode", "Exception ee: $e")
+    }
+
 
     onComplete() // Ensure scanning resumes
 }

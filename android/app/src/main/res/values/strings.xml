@@ -4,4 +4,8 @@
     <string name="cancel">Cancel</string>
     <string name="qr_code_database">qr_code_database</string>
     <string name="open_url">Open url</string>
+    <string name="globalexceptionhandler">GlobalExceptionHandler</string>
+    <string name="use_your_biometric_credentials_to_authenticate">Use your biometric credentials to authenticate</string>
+    <string name="authentication_required">Authentication required</string>
+    <string name="biometric_extra_pm">PROMPT_MESSAGE</string>
 </resources>
