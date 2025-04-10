@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.MyApp.Fullscreen" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Ensure status bar color -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item> <!-- Adjust text color -->
+    </style>
+</resources>

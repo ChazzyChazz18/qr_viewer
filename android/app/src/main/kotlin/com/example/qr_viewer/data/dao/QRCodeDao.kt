@@ -12,6 +12,6 @@ interface QRCodeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertQRCode(roomQrCode: RoomQRCode): Long
 
-    @Query("SELECT * FROM qr_codes")
+    @Query("SELECT * FROM qr_codes ORDER BY timestamp DESC")
     fun getAllQRCodesFlow(): Flow<List<RoomQRCode>>
 }

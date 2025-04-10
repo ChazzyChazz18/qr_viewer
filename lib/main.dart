@@ -12,10 +12,8 @@ class QRViewer extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'QR Viewer',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: Colors.teal),
       home: const LoginPage(),
     );
   }
