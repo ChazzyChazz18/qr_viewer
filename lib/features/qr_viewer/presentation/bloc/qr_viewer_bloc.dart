@@ -4,12 +4,13 @@ import 'package:qr_viewer/features/shared/pigeon.dart';
 class QRViewerBloc {
   final qrCodeApi = QRCodeApi();
 
-  //
+  /// Here we are using the QRCodeApi to scan a QR code and return the result.
   Future<String?> scanQRCode() async {
     final result = await qrCodeApi.scanQRCode();
     return result;
   }
 
+  /// This method fetches all saved QR codes from the database using the QRCodeApi.
   Future<List<QRCode?>> getAllQRCodes() async {
     List<QRCode?> fetchedQRCodes = [];
     try {
