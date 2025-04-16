@@ -5,14 +5,24 @@ import 'package:qr_viewer/features/shared/qr_viewer_appbar.dart';
 import 'package:qr_viewer/utils/date_utils.dart';
 
 class QRDataListPage extends StatefulWidget {
-  const QRDataListPage({super.key});
+  /// For testing purposes, this allows us to inject a mock QRViewerBloc.
+  final QRViewerBloc? mockBloc;
+
+  const QRDataListPage({super.key, this.mockBloc});
 
   @override
   State<QRDataListPage> createState() => _QRDataListPageState();
 }
 
 class _QRDataListPageState extends State<QRDataListPage> {
-  final QRViewerBloc _qrViewerBloc = QRViewerBloc();
+  late final QRViewerBloc _qrViewerBloc;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _qrViewerBloc = widget.mockBloc ?? QRViewerBloc();
+  }
 
   @override
   Widget build(BuildContext context) {

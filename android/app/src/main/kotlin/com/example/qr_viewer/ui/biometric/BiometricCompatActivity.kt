@@ -1,8 +1,13 @@
 package com.example.qr_viewer.ui.biometric
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import androidx.activity.compose.setContent
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,7 +41,9 @@ class BiometricCompatActivity : AppCompatActivity() {
 
         // Make the activity fullscreen and set the status bar color
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        Color(0xFF008080).toArgb().also { window.statusBarColor = it } // Set status bar to tea
+
+        // Set the status bar color
+        setStatusBarBackground()
 
         // Set the Compose content for the background
         setContent {
@@ -48,6 +55,19 @@ class BiometricCompatActivity : AppCompatActivity() {
         handleBiometricPrompt()
     }
 
+    fun setStatusBarBackground() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) { // API 30+
+            window.insetsController?.setSystemBarsAppearance(
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+            )
+        }else {
+            // Fallback for older Android versions even though its deprecated
+            window.statusBarColor = Color(0xFF008080).toArgb()
+        }
+    }
+
+    @VisibleForTesting
     private fun handleBiometricPrompt() {
         val biometricPrompt = androidx.biometric.BiometricPrompt(
             this,
@@ -77,7 +97,8 @@ class BiometricCompatActivity : AppCompatActivity() {
         biometricPrompt.authenticate(getBiometricPromptInfo())
     }
 
-    private fun getBiometricPromptInfo(): androidx.biometric.BiometricPrompt.PromptInfo {
+    @VisibleForTesting
+    fun getBiometricPromptInfo(): androidx.biometric.BiometricPrompt.PromptInfo {
         val promptMessage = intent.getStringExtra(getString(R.string.biometric_extra_pm))
             ?: getString(R.string.authentication_required)
 
@@ -90,7 +111,8 @@ class BiometricCompatActivity : AppCompatActivity() {
             ).build()
     }
 
-    private fun sendResult(success: Boolean) {
+    @VisibleForTesting
+    fun sendResult(success: Boolean) {
         val intent = Intent().apply { putExtra("auth_result", success) }
         setResult(RESULT_OK, intent)
     }
