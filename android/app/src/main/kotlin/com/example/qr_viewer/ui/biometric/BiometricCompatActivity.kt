@@ -3,8 +3,6 @@ package com.example.qr_viewer.ui.biometric
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.view.WindowInsets
 import android.view.WindowInsetsController
 import androidx.activity.compose.setContent
 import androidx.annotation.VisibleForTesting
@@ -55,15 +53,21 @@ class BiometricCompatActivity : AppCompatActivity() {
         handleBiometricPrompt()
     }
 
+    @Suppress("DEPRECATION")
     fun setStatusBarBackground() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) { // API 30+
-            window.insetsController?.setSystemBarsAppearance(
-                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
-                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-            )
-        }else {
-            // Fallback for older Android versions even though its deprecated
-            window.statusBarColor = Color(0xFF008080).toArgb()
+        window.decorView.post {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) { // API 30+
+                window.insetsController?.setSystemBarsAppearance(
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                )
+            } else {
+                // Fallback for older Android versions
+                // Marked as Deprecated in API 30 for
+                // the whole android system reason for
+                // the suppression
+                window.statusBarColor = Color(0xFF008080).toArgb()
+            }
         }
     }
 
