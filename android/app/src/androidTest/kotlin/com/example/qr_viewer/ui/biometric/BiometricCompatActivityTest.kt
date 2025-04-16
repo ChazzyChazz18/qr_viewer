@@ -17,7 +17,10 @@ class BiometricCompatActivityTest {
 
         scenario.onActivity { activity ->
             val intent = Intent().apply {
-                putExtra(activity.getString(R.string.biometric_extra_pm), "Custom Message")
+                putExtra(
+                    activity.getString(R.string.biometric_extra_pm),
+                    "Custom Message"
+                )
             }
             activity.intent = intent
 
