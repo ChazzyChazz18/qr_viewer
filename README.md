@@ -48,5 +48,5 @@ Welcome to the **QR Viewer**! 🚀 This application combines the power of native
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo-name/qr-viewer-app.git
+   git clone https://github.com/ChazzyChazz18/qr-viewer-app.git
    cd qr-viewer-app
