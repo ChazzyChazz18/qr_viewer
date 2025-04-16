@@ -20,7 +20,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.13.0' # Explicit Flutter version
+          flutter-version: '3.29.2' # Explicit Flutter version
 
       # Step 3: Install dependencies
       - name: Install Dependencies
