@@ -31,44 +31,45 @@ jobs:
         run: flutter test
 
   android-native-tests:
-     name: Run Android Native Tests
-     runs-on: ubuntu-latest
+    name: Run Android Native Tests
+    runs-on: ubuntu-latest
 
-     steps:
-       # Step 1: Checkout the repository
-       - name: Checkout Code
-         uses: actions/checkout@v3
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-       # Step 2: Set up JDK
-       - name: Set up JDK
-         uses: actions/setup-java@v3
-         with:
-           distribution: 'zulu'
-           java-version: '11'
+      # Step 2: Set up JDK
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '11'
 
-       # Step 3: Cache Gradle dependencies
-       - name: Cache Gradle dependencies
-         uses: actions/cache@v3
-         with:
-           path: ~/.gradle/caches
-           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-           restore-keys: |
-             ${{ runner.os }}-gradle-
+      # Step 3: Cache Gradle dependencies
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
-       # Step 4: Set Flutter Root for Linux
-       - name: Set FLUTTER_ROOT
-         run: echo "FLUTTER_ROOT=/opt/flutter" >> $GITHUB_ENV
+      # Step 4: Replace Windows Path in settings.gradle
+      - name: Update settings.gradle for Linux
+        run: |
+          sed -i 's|E:\\\\Flutter\\\\flutter|/opt/flutter|g' android/settings.gradle
 
-       # Step 5: Grant execute permissions for Gradle Wrapper
-       - name: Grant execute permissions for Gradle Wrapper
-         run: chmod +x ./android/gradlew
+      # Step 5: Grant execute permissions for Gradle Wrapper
+      - name: Grant execute permissions for Gradle Wrapper
+        run: chmod +x ./android/gradlew
 
-       # Step 6: Build and run Android native tests
-       - name: Run Android Native Tests
-         working-directory: android
-         run: ./gradlew testDebugUnitTest
+      # Step 6: Build and run Android native tests
+      - name: Run Android Native Tests
+        working-directory: android
+        run: ./gradlew testDebugUnitTest
 
-       # Step 7: Generate Android Lint Report (Optional)
-       - name: Run Android Lint
-         working-directory: android
-         run: ./gradlew lintDebug
+      # Step 7: Run Android Lint (Optional)
+      - name: Run Android Lint
+        working-directory: android
+        run: ./gradlew lintDebug
