@@ -55,16 +55,20 @@ jobs:
            restore-keys: |
              ${{ runner.os }}-gradle-
 
-       # Step 4: Grant execute permissions for Gradle Wrapper
+       # Step 4: Set Flutter Root for Linux
+       - name: Set FLUTTER_ROOT
+         run: echo "FLUTTER_ROOT=/opt/flutter" >> $GITHUB_ENV
+
+       # Step 5: Grant execute permissions for Gradle Wrapper
        - name: Grant execute permissions for Gradle Wrapper
          run: chmod +x ./android/gradlew
 
-       # Step 5: Build and run Android native tests
+       # Step 6: Build and run Android native tests
        - name: Run Android Native Tests
          working-directory: android
          run: ./gradlew testDebugUnitTest
 
-       # Step 6: Generate Android Lint Report (Optional)
+       # Step 7: Generate Android Lint Report (Optional)
        - name: Run Android Lint
          working-directory: android
          run: ./gradlew lintDebug
