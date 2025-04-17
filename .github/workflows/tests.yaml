@@ -39,20 +39,30 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Install Flutter
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2
+      # Step 2: Set up JDK
+      - name: Set up JDK
+        uses: actions/setup-java@v3
         with:
-          flutter-version: 'stable'
+          distribution: 'zulu'
+          java-version: '11'
 
-      # Step 3: Set flutterSdkPath environment variable
+      # Step 3: Cache Gradle dependencies
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # Step 4: Set flutterSdkPath for Linux
       - name: Set flutterSdkPath
-        run: echo "flutterSdkPath=$(flutter sdk-path)" >> $GITHUB_ENV
+        run: echo "flutterSdkPath=/opt/flutter" >> $GITHUB_ENV
 
       # Step 5: Replace flutterSdkPath in settings.gradle
       - name: Update flutterSdkPath in settings.gradle
         run: |
-          sed -i 's|\$flutterSdkPath|$flutterSdkPath|g' android/settings.gradle
+          sed -i 's|\$flutterSdkPath|/opt/flutter|g' android/settings.gradle
 
       # Step 6: Grant execute permissions for Gradle Wrapper
       - name: Grant execute permissions for Gradle Wrapper
