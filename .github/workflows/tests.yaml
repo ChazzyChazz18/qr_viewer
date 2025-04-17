@@ -55,21 +55,25 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # Step 4: Replace Windows Path in settings.gradle
-      - name: Update settings.gradle for Linux
-        run: |
-          sed -i 's|E:\\\\Flutter\\\\flutter|/opt/flutter|g' android/settings.gradle
+      # Step 4: Set flutterSdkPath for Linux
+      - name: Set flutterSdkPath
+        run: echo "flutterSdkPath=/opt/flutter" >> $GITHUB_ENV
 
-      # Step 5: Grant execute permissions for Gradle Wrapper
+      # Step 5: Replace flutterSdkPath in settings.gradle
+      - name: Update flutterSdkPath in settings.gradle
+        run: |
+          sed -i 's|\$flutterSdkPath|/opt/flutter|g' android/settings.gradle
+
+      # Step 6: Grant execute permissions for Gradle Wrapper
       - name: Grant execute permissions for Gradle Wrapper
         run: chmod +x ./android/gradlew
 
-      # Step 6: Build and run Android native tests
+      # Step 7: Build and run Android native tests
       - name: Run Android Native Tests
         working-directory: android
         run: ./gradlew testDebugUnitTest
 
-      # Step 7: Run Android Lint (Optional)
+      # Step 8: Run Android Lint (Optional)
       - name: Run Android Lint
         working-directory: android
         run: ./gradlew lintDebug
