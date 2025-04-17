@@ -49,10 +49,6 @@ jobs:
       - name: Set flutterSdkPath
         run: echo "flutterSdkPath=$(flutter sdk-path)" >> $GITHUB_ENV
 
-      # Step 4: Debugging - Print flutterSdkPath
-      - name: Print flutterSdkPath
-        run: echo "Flutter SDK Path: $flutterSdkPath"
-
       # Step 5: Replace flutterSdkPath in settings.gradle
       - name: Update flutterSdkPath in settings.gradle
         run: |
