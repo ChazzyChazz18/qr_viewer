@@ -62,7 +62,11 @@ jobs:
       - name: Flutter Pub Get
         run: C:\flutter\bin\flutter pub get
 
-      # Step 6: Run Android Native Tests
+      # Step 6: Debug Environment Variables
+      - name: Debug Environment Variables
+        run: echo %flutterSdkPath%
+
+      # Step 7: Run Android Native Tests
       - name: Run Android Native Tests
         working-directory: android
         run: cmd /c gradlew.bat testDebugUnitTest --stacktrace --info
