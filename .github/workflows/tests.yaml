@@ -69,9 +69,9 @@ jobs:
       # Step 7: Run Android native tests
       - name: Run Android Native Tests
         working-directory: android
-        run: cmd /c ./gradlew.bat testDebugUnitTest --stacktrace --info
+        run: cmd /c gradlew.bat testDebugUnitTest --stacktrace --info
 
       # Step 8: Run Android Lint (Optional)
       - name: Run Android Lint
         working-directory: android
-        run: cmd /c ./gradlew.bat lintDebug
+        run: cmd /c gradlew.bat lintDebug
