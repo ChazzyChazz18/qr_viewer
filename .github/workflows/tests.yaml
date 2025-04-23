@@ -46,6 +46,17 @@ jobs:
           distribution: 'zulu'
           java-version: '11'
 
+      - name: Install Flutter SDK
+        run: |
+          git clone https://github.com/flutter/flutter.git /opt/flutter
+          echo "flutterSdkPath=/opt/flutter" >> $GITHUB_ENV
+
+      - name: Flutter Pub Get
+        run: /opt/flutter/bin/flutter pub get
+
+      - name: Flutter Clean
+        run: /opt/flutter/bin/flutter clean
+
       # Step 3: Cache Gradle dependencies
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
