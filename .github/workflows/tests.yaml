@@ -62,16 +62,16 @@ jobs:
       - name: Flutter Pub Get
         run: C:\flutter\bin\flutter pub get
 
-      # Step 6: Debug File Paths
-      - name: Debug File Paths
+      # Step 6: Debug Android Directory
+      - name: Debug Android Directory
         run: dir android
 
       # Step 7: Run Android native tests
       - name: Run Android Native Tests
         working-directory: android
-        run: cmd /c gradlew.bat testDebugUnitTest --stacktrace --info
+        run: cmd /c ./gradlew.bat testDebugUnitTest --stacktrace --info
 
       # Step 8: Run Android Lint (Optional)
       - name: Run Android Lint
         working-directory: android
-        run: cmd /c gradlew.bat lintDebug
+        run: cmd /c ./gradlew.bat lintDebug
