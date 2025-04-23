@@ -40,7 +40,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Set up JDK (Ensure Java 17 for compatibility)
+      # Step 2: Set up JDK
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -51,6 +51,8 @@ jobs:
       - name: Install Flutter SDK
         run: |
           git clone https://github.com/flutter/flutter.git /opt/flutter
+          cd /opt/flutter
+          git checkout stable
           echo "flutterSdkPath=/opt/flutter" >> $GITHUB_ENV
           /opt/flutter/bin/flutter doctor
 
@@ -82,10 +84,10 @@ jobs:
           /opt/flutter/bin/flutter doctor
           ./android/gradlew --version
 
-      # Step 9: Build and run Android native tests
+      # Step 9: Run Android native tests
       - name: Run Android Native Tests
         working-directory: android
-        run: ./gradlew testDebugUnitTest
+        run: ./gradlew testDebugUnitTest --stacktrace --info --warning-mode all
 
       # Step 10: Run Android Lint (Optional)
       - name: Run Android Lint
