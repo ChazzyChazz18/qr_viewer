@@ -33,14 +33,14 @@ jobs:
 
   android-native-tests:
     name: Run Android Native Tests
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       # Step 1: Checkout the repository
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Set up JDK (Use Java 17 for Gradle compatibility)
+      # Step 2: Set up JDK (Use Java 17 to match Gradle compatibility)
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -50,46 +50,44 @@ jobs:
       # Step 3: Install Flutter SDK
       - name: Install Flutter SDK
         run: |
-          git clone https://github.com/flutter/flutter.git /opt/flutter
-          cd /opt/flutter
-          git checkout stable  # Ensure the stable version matches your local version
-          echo "flutterSdkPath=/opt/flutter" >> $GITHUB_ENV
-          /opt/flutter/bin/flutter doctor
+          git clone https://github.com/flutter/flutter.git C:\flutter
+          echo "flutterSdkPath=C:\flutter" >> $GITHUB_ENV
+          C:\flutter\bin\flutter doctor
 
       # Step 4: Clean Flutter build cache
       - name: Flutter Clean
-        run: /opt/flutter/bin/flutter clean
+        run: C:\flutter\bin\flutter clean
 
       # Step 5: Resolve Flutter dependencies
       - name: Flutter Pub Get
-        run: /opt/flutter/bin/flutter pub get
+        run: C:\flutter\bin\flutter pub get
 
-      # Step 6: Cache Gradle dependencies
+      # Step 6: Cache Gradle dependencies (Path adjusted for Windows)
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
         with:
-          path: ~/.gradle/caches
+          path: C:\Users\runneradmin\.gradle\caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # Step 7: Grant execute permissions for Gradle Wrapper
-      - name: Grant execute permissions for Gradle Wrapper
-        run: chmod +x ./android/gradlew
+      # Step 7: Grant execute permissions for Gradle Wrapper (Optional on Windows)
+      - name: Ensure Gradlew Permissions
+        run: icacls android\gradlew /grant Everyone:F
 
-      # Step 8: Debug Environment (Optional, but helpful)
+      # Step 8: Debug setup (Optional but helpful)
       - name: Verify Environment
         run: |
           echo "JAVA_HOME: $JAVA_HOME"
-          /opt/flutter/bin/flutter doctor
-          ./android/gradlew --version
+          C:\flutter\bin\flutter doctor
+          android\gradlew --version
 
       # Step 9: Run Android native tests
       - name: Run Android Native Tests
         working-directory: android
-        run: ./gradlew testDebugUnitTest --stacktrace --info --warning-mode all
+        run: android\gradlew testDebugUnitTest --stacktrace --info
 
       # Step 10: Run Android Lint (Optional)
       - name: Run Android Lint
         working-directory: android
-        run: ./gradlew lintDebug
+        run: android\gradlew lintDebug
