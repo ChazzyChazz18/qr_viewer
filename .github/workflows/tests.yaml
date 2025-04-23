@@ -40,7 +40,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Set up JDK (Updated Java version to 17, ensuring compatibility)
+      # Step 2: Set up JDK (Ensure Java 17 for compatibility)
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -52,6 +52,7 @@ jobs:
         run: |
           git clone https://github.com/flutter/flutter.git /opt/flutter
           echo "flutterSdkPath=/opt/flutter" >> $GITHUB_ENV
+          /opt/flutter/bin/flutter doctor
 
       # Step 4: Clean Flutter build cache
       - name: Flutter Clean
@@ -61,7 +62,7 @@ jobs:
       - name: Flutter Pub Get
         run: /opt/flutter/bin/flutter pub get
 
-      # Step 6: Cache Gradle dependencies (Ensures build optimization)
+      # Step 6: Cache Gradle dependencies
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
         with:
@@ -70,27 +71,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # Step 7: Replace Flutter SDK path in settings.gradle (Ensures correct environment setup)
-      - name: Update flutterSdkPath in settings.gradle
-        run: |
-          sed -i 's|\$flutterSdkPath|/opt/flutter|g' android/settings.gradle
-
-      # Step 8: Grant execute permissions for Gradle Wrapper
+      # Step 7: Grant execute permissions for Gradle Wrapper
       - name: Grant execute permissions for Gradle Wrapper
         run: chmod +x ./android/gradlew
 
-      # Step 9: Verify Gradle and Flutter setup (Optional but recommended debugging step)
-      - name: Verify Setup
+      # Step 8: Debug setup (Optional)
+      - name: Verify Environment
         run: |
+          echo "JAVA_HOME: $JAVA_HOME"
           /opt/flutter/bin/flutter doctor
           ./android/gradlew --version
 
-      # Step 10: Run Android native tests
+      # Step 9: Build and run Android native tests
       - name: Run Android Native Tests
         working-directory: android
         run: ./gradlew testDebugUnitTest
 
-      # Step 11: Run Android Lint (Optional quality check)
+      # Step 10: Run Android Lint (Optional)
       - name: Run Android Lint
         working-directory: android
         run: ./gradlew lintDebug
