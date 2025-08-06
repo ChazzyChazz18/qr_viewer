@@ -8,6 +8,10 @@ Welcome to the **QR Viewer**! 🚀 This application combines the power of native
 
 ---
 
+## 📱 App Preview
+
+![Screenshot](assets/WhatsApp Image 2025-08-06 at 14.53.41_82dd860e.jpg)
+
 ## Features
 
 ### Android (Native)
