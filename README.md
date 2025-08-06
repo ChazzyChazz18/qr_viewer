@@ -11,6 +11,8 @@ Welcome to the **QR Viewer**! 🚀 This application combines the power of native
 ## 📱 App Preview
 
 ![Screenshot](assets/screenshot_1.jpg)
+![Screenshot](assets/screenshot_2.jpg)
+![Screenshot](assets/screenshot_3.jpg)
 
 ## Features
 
