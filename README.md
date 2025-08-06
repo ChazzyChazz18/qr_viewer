@@ -14,7 +14,7 @@ Welcome to the **QR Viewer**! 🚀 This application combines the power of native
   <img src="assets/screenshot_1.png" width="256" />
   <img src="assets/screenshot_2.png" width="256" />
   <img src="assets/screenshot_3.png" width="256" />
-</div
+</div>
 
 ## Features
 
