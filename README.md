@@ -11,9 +11,9 @@ Welcome to the **QR Viewer**! 🚀 This application combines the power of native
 ## 📱 App Preview
 
 <div style="display: flex; gap: 10px;">
-  <img src="assets/screenshot_1.png" width="256" />
-  <img src="assets/screenshot_2.png" width="256" />
-  <img src="assets/screenshot_3.png" width="256" />
+  <img src="assets/screenshot_1.jpg" width="256" />
+  <img src="assets/screenshot_2.jpg" width="256" />
+  <img src="assets/screenshot_3.jpg" width="256" />
 </div>
 
 ## Features
